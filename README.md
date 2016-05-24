@@ -1,0 +1,2 @@
+# UninstallGuard
+Android Uninstallation Listener.
