@@ -7,7 +7,7 @@
 #include <sys/wait.h>
 #include "guard.h"
 
-static const char* class_path_name = "";
+static const char* class_path_name = "com/shunix/uninstallguard/GuardApplication";
 static const char* data_path = "/data/data";
 static JNINativeMethod methods[] = {
     {"startGuard", "(Ljava/lang/String)V", &StartGuard}
