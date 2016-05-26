@@ -1,16 +1,16 @@
 #include <limits.h>
 #include <jni.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <android/log.h>
 #include <sys/inotify.h>
-#include <sys/wait.h>
 #include "guard.h"
 
-static const char* class_path_name = "com/shunix/uninstallguard/GuardApplication";
-static const char* data_path = "/data/data";
+static const char* class_path_name = "com/shunix/uninstallguard/app/GuardApplication";
+static const char* data_path = "/data/data/";
 static JNINativeMethod methods[] = {
-    {"startGuard", "(Ljava/lang/String)V", &StartGuard}
+    {"startGuard", "(Ljava/lang/String;)V", &StartGuard}
 };
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
@@ -68,8 +68,7 @@ JNIEXPORT void JNICALL StartGuard(JNIEnv* env, jobject obj, jstring package_name
             }
         } else {
             LOGD("Forked pid: %d", pid);
-            int status;
-            waitpid(pid, &status, 0);
+            exit(0);
         }
     }
     (*env)->ReleaseStringUTFChars(env, package_name, native_package_name);
