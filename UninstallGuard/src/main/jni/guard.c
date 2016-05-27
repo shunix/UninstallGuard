@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <limits.h>
 #include <jni.h>
 #include <stdlib.h>
@@ -55,16 +56,22 @@ JNIEXPORT void JNICALL StartGuard(JNIEnv* env, jobject obj, jstring package_name
             }
             uint8_t buffer[INOTIFY_BUFFER_LENGTH];
             for(;;) {
-                int read_length = read(inotify_fd, buffer, INOTIFY_BUFFER_LENGTH);
-                LOGD("Got event, read length: %d", read_length);
-                uint8_t* p = buffer;
-                if (read_length > 0) {
-                  for (int i  = 0; i < read_length;) {
-                      LOGD("App was uninstalled");
-                      int name_length = ((struct inotify_event*) p)->len;
-                      p += (sizeof(struct inotify_event) + name_length);
-                      i += (sizeof(struct inotify_event) + name_length);
-                  }
+                fd_set fds;
+                FD_ZERO(&fds);
+                FD_SET(inotify_fd, &fds);
+                int ret = select(FD_SETSIZE, &fds, NULL, NULL, NULL);
+                if (ret > 0 && errno != EINTR) {
+                    LOGD("select returned %d", ret);
+                    int read_length = read(inotify_fd, buffer, INOTIFY_BUFFER_LENGTH);
+                    uint8_t* p = buffer;
+                    if (read_length > 0) {
+                      for (int i  = 0; i < read_length;) {
+                          LOGD("App was uninstalled");
+                          int name_length = ((struct inotify_event*) p)->len;
+                          p += (sizeof(struct inotify_event) + name_length);
+                          i += (sizeof(struct inotify_event) + name_length);
+                      }
+                    }
                 }
             }
         } else {
