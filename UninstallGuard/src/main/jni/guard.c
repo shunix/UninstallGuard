@@ -7,7 +7,7 @@
 #include <sys/inotify.h>
 #include "guard.h"
 
-static const char* class_path_name = "com/shunix/uninstallguard/app/GuardApplication";
+static const char* class_path_name = "com/shunix/uninstallguard/service/GuardService";
 static const char* data_path = "/data/data/";
 static JNINativeMethod methods[] = {
     {"startGuard", "(Ljava/lang/String;)V", &StartGuard}
@@ -56,6 +56,7 @@ JNIEXPORT void JNICALL StartGuard(JNIEnv* env, jobject obj, jstring package_name
             uint8_t buffer[INOTIFY_BUFFER_LENGTH];
             for(;;) {
                 int read_length = read(inotify_fd, buffer, INOTIFY_BUFFER_LENGTH);
+                LOGD("Got event, read length: %d", read_length);
                 uint8_t* p = buffer;
                 if (read_length > 0) {
                   for (int i  = 0; i < read_length;) {
@@ -68,7 +69,7 @@ JNIEXPORT void JNICALL StartGuard(JNIEnv* env, jobject obj, jstring package_name
             }
         } else {
             LOGD("Forked pid: %d", pid);
-            exit(0);
+            exit(-1);
         }
     }
     (*env)->ReleaseStringUTFChars(env, package_name, native_package_name);
