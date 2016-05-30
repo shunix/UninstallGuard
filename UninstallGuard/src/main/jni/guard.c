@@ -65,12 +65,12 @@ JNIEXPORT void JNICALL StartGuard(JNIEnv* env, jobject obj, jstring package_name
                     int read_length = read(inotify_fd, buffer, INOTIFY_BUFFER_LENGTH);
                     uint8_t* p = buffer;
                     if (read_length > 0) {
-                      for (int i  = 0; i < read_length;) {
-                          LOGD("App was uninstalled");
-                          int name_length = ((struct inotify_event*) p)->len;
-                          p += (sizeof(struct inotify_event) + name_length);
-                          i += (sizeof(struct inotify_event) + name_length);
-                      }
+                        for (int i  = 0; i < read_length;) {
+                            LOGD("App was uninstalled");
+                            int name_length = ((struct inotify_event*) p)->len;
+                            p += (sizeof(struct inotify_event) + name_length);
+                            i += (sizeof(struct inotify_event) + name_length);
+                        }
                     }
                 }
             }
